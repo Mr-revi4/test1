@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C3D439D6-5A2A-403A-A361-7E47D9C529E3}</ProjectGuid>
+    <ProjectGuid>{611286AF-837C-49D8-ADA3-F155457F749B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>test1Entity</RootNamespace>
     <AssemblyName>test1Entity</AssemblyName>
@@ -52,16 +52,55 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CRUD.cs" />
-    <Compile Include="ModelContext.cs" />
+    <Compile Include="Houses.cs">
+      <DependentUpon>HousesAndStreetsModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HousesAndStreetsModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HousesAndStreetsModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HousesAndStreetsModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HousesAndStreetsModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HousesAndStreetsModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HousesAndStreetsModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestTable.cs" />
+    <Compile Include="Streets.cs">
+      <DependentUpon>HousesAndStreetsModel.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
+    <None Include="App.config" />
+    <EntityDeploy Include="HousesAndStreetsModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>HousesAndStreetsModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="HousesAndStreetsModel.edmx.diagram">
+      <DependentUpon>HousesAndStreetsModel.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HousesAndStreetsModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>HousesAndStreetsModel.Context.cs</LastGenOutput>
+      <DependentUpon>HousesAndStreetsModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="HousesAndStreetsModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HousesAndStreetsModel.edmx</DependentUpon>
+      <LastGenOutput>HousesAndStreetsModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

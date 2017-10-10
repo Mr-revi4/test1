@@ -13,22 +13,22 @@ namespace test1
         string sqlExpression;
 
         public void Insert(string value1, string value2, int flag)
-        {            
-            sqlExpression = "INSERT INTO @table (@col1, @col2) VALUES (@value1, @value2)";
-            string column1 ="", column2 = "", table = "";
-
-            if(flag == 1)
+        {
+            string column1 = "", column2 = "", table = "";
+            if (flag == 1)
             {
                 column1 = "City";
                 column2 = "Name";
                 table = "Streets";
             }
-            else if(flag == 2)
+            else if (flag == 2)
             {
                 column1 = "Street";
                 column2 = "Number";
                 table = "Houses";
             }
+
+            sqlExpression = string.Format("INSERT INTO {0} ({1}, {2}) VALUES (@value1, @value2)", table, column1, column2);           
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -36,17 +36,10 @@ namespace test1
                 {                     
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
-                    SqlParameter val1 = new SqlParameter("@val1", value1);
+                    SqlParameter val1 = new SqlParameter("@value1", value1);
                     command.Parameters.Add(val1);
-                    SqlParameter val2 = new SqlParameter("@val2", value2);
+                    SqlParameter val2 = new SqlParameter("@value2", value2);
                     command.Parameters.Add(val2);
-                    SqlParameter col1 = new SqlParameter("@col1", column1);
-                    command.Parameters.Add(col1);
-                    SqlParameter col2 = new SqlParameter("@col2", column2);
-                    command.Parameters.Add(col2);
-                    SqlParameter tab = new SqlParameter("@table", table);
-                    command.Parameters.Add(tab);
-
                     int number = command.ExecuteNonQuery();
                     Console.WriteLine("Uploaded {0}", number);
                 }
@@ -61,21 +54,33 @@ namespace test1
             }
         }
 
-        public void Update(string name, string city, int numberOfHouse, int id)
-        {            
-            sqlExpression = string.Format("UPDATE Streets SET Name = @Name, City = @City, NumberOfHouses = @Numb WHERE id = {0}", id);
+        public void Update(int id, string value1, string value2, int flag)
+        {
+            string column1 = "", column2 = "", table = "";
+            if (flag == 1)
+            {
+                column1 = "City";
+                column2 = "Name";
+                table = "Streets";
+            }
+            else if (flag == 2)
+            {
+                column1 = "Street";
+                column2 = "Number";
+                table = "Houses";
+            }
+            sqlExpression = string.Format("UPDATE {0} SET {1} = @value1, {2} = @value2 WHERE id = {3}", table, column1, column2, id);
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
-                    SqlParameter nameParam = new SqlParameter("@Name", name);
-                    command.Parameters.Add(nameParam);
-                    SqlParameter cityParam = new SqlParameter("@City", city);
-                    command.Parameters.Add(cityParam);
-                    SqlParameter numbParam = new SqlParameter("@Numb", numberOfHouse);
-                    command.Parameters.Add(numbParam);
+                    SqlParameter val1 = new SqlParameter("@value1", value1);
+                    command.Parameters.Add(val1);
+                    SqlParameter val2 = new SqlParameter("@value2", value2);
+                    command.Parameters.Add(val2);
+                    
                     int number = command.ExecuteNonQuery();
                     Console.WriteLine("Updated {0}", number);
                 }
@@ -90,9 +95,15 @@ namespace test1
             }
         }
 
-        public void Delete(int id)
+        public void Delete(int id, int flag)
         {
-            sqlExpression = string.Format("DELETE FROM Streets WHERE id = {0}", id);
+            string table = "";
+            if (flag == 1)            
+                table = "Streets";
+            else if (flag == 2)
+                table = "Houses";
+
+            sqlExpression = string.Format("DELETE FROM {0} WHERE id = {1}", table, id);
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -113,12 +124,17 @@ namespace test1
             }
         }
 
-        public void Select(int id)
+        public void Select(int id, int flag)
         {
-            sqlExpression = string.Format("SELECT * FROM Streets WHERE id = {0}", id);
-            try
+            string table = "";
+            if (flag == 1)
+                table = "Streets";
+            else if (flag == 2)
+                table = "Houses";
+            sqlExpression = string.Format("SELECT * FROM {0} WHERE id = {1}", table, id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                try
                 {
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
@@ -126,16 +142,20 @@ namespace test1
 
                     if (reader.HasRows)
                     {
-                        while (reader.Read())                            
-                             Console.WriteLine("{0} = {1}", reader.GetName(2), reader.GetValue(3));
+                        while (reader.Read())
+                            Console.WriteLine("{0} {1}", reader.GetValue(1), reader.GetValue(2));
                     }
                     reader.Close();
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }            
         }
     }
 }

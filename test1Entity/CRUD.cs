@@ -8,44 +8,85 @@ namespace test1Entity
 {
     class CRUD
     {
-        public string Create(int col1, float col2)
+        public void CreateStreet(string city, string name)
         {
-            using(ModelContext db = new ModelContext())
+            using (var db = new HousesAndStreetsEntities())
             {
-                db.TestTable.Add(new TestTable { TestCol1 = col1, TestCol2 = col2 });
-                db.SaveChanges();                
-            }
-            return "Добавлено 1 поле.";
-        }
-
-        public string Update(int col1, float col2)
-        {
-            using (ModelContext db = new ModelContext())
-            {
-                db.TestTable.FirstOrDefault().TestCol1 = col1;
-                db.TestTable.FirstOrDefault().TestCol2 = col2;
+                Streets street = new Streets {City = city, Name = name };
+                db.Streets.Add(street);
                 db.SaveChanges();
             }
-            return "Изменено 1 поле.";
         }
 
-        public string Delete()
+        public void CreateHouse(string street, string number)
         {
-            using (ModelContext db = new ModelContext())
+            using (var db = new HousesAndStreetsEntities())
             {
-                db.TestTable.Remove(db.TestTable.FirstOrDefault());
+                Houses house = new Houses { Street = street, Number = number };
+                db.Houses.Add(house);
                 db.SaveChanges();
             }
-            return "Удалено 1 поле.";
         }
 
-        public void Read()
+        public void UpdateStreet(int id, string city, string name)
         {
-            using (ModelContext db = new ModelContext())
+            using (var db = new HousesAndStreetsEntities())
             {
-                var list = db.TestTable.ToList();
+                Streets street = db.Streets.SingleOrDefault(b => b.Id == id);
+                street.Name = name;
+                street.City = city;
+                db.SaveChanges();
+            }
+        }
+
+        public void UpdateHouse(int id, string street, string number)
+        {
+            using (var db = new HousesAndStreetsEntities())
+            {
+                Houses house = db.Houses.SingleOrDefault(b => b.Id == id);
+                house.Street = street;
+                house.Number = number;
+                db.SaveChanges();
+            }
+        }
+
+        public void DeleteStreet(int id)
+        {
+            using (var db = new HousesAndStreetsEntities())
+            {
+                Streets street = db.Streets.SingleOrDefault(b => b.Id == id);
+                db.Streets.Remove(street);
+                db.SaveChanges();
+            }
+        }
+
+        public void DeleteHouse(int id)
+        {
+            using (var db = new HousesAndStreetsEntities())
+            {
+                Houses house = db.Houses.SingleOrDefault(b => b.Id == id);
+                db.Houses.Remove(house);
+                db.SaveChanges();
+            }
+        }
+
+        public void ReadStreet()
+        {
+            using (var db = new HousesAndStreetsEntities())
+            {
+                var list = db.Streets.ToList();
                 foreach (var element in list)
-                    Console.WriteLine("Col1 = {0}\nCol2 = {1}", element.TestCol1, element.TestCol2);
+                    Console.WriteLine("{0}.{1} {2}", element.Id, element.City, element.Name);
+            }
+        }
+
+        public void ReadHouse()
+        {
+            using (var db = new HousesAndStreetsEntities())
+            {
+                var list = db.Houses.ToList();
+                foreach (var element in list)
+                    Console.WriteLine("{0}.{1} {2}", element.Id, element.Street, element.Number);
             }
         }
     }
