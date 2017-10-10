@@ -37,7 +37,7 @@ namespace test1
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
                     SqlParameter val1 = new SqlParameter("@value1", value1);
-                    command.Parameters.Add(val1);
+                    command.Parameters.Add("@value1", System.Data.SqlDbType.NVarChar).Value = value1;
                     SqlParameter val2 = new SqlParameter("@value2", value2);
                     command.Parameters.Add(val2);
                     int number = command.ExecuteNonQuery();
