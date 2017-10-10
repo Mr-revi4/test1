@@ -12,18 +12,40 @@ namespace test1
         static void Main(string[] args)
         {
             Db db = new Db();
-            db.CreateDataBase();
-            db.CreateTable();
-            Console.WriteLine("Добавление поля: ");
-            db.Insert();
-            db.Select("1");
-            Console.Write("Обновление поля:\nВведите номер поля: ");
-            string number = Console.ReadLine();
-            db.Update(number);
-            db.Select(number);
-            Console.Write("Удаление поля:\nВведите номер поля: ");
-            number = Console.ReadLine();
-            db.Delete(number);
+
+             Console.WriteLine("Insert:");
+
+             Console.Write("Enter the street name: ");
+             string name = Console.ReadLine();
+             Console.Write("Enter the city name: ");
+             string city = Console.ReadLine();
+
+             db.Insert(name, city, 1);
+
+            /*   
+            Console.WriteLine("Update:");
+
+            Console.Write("Enter the line number(id): ");
+            int id = int.Parse(Console.ReadLine());
+
+            Console.Write("Enter the new street name: ");
+            name = Console.ReadLine();
+            Console.Write("Enter the new city name: ");
+            city = Console.ReadLine();
+            Console.Write("Enter the number of houses: ");
+            numb = int.Parse(Console.ReadLine());
+
+            db.Update(name, city, numb, id);
+
+            Console.WriteLine("Update:");
+
+            Console.Write("Enter the line number(id): ");
+            id = int.Parse(Console.ReadLine());
+
+            db.Delete(id);*/
+
+            db.Select(12);
+
             Console.ReadKey();
         }
     }

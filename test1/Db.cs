@@ -9,139 +9,116 @@ namespace test1
 {
     class Db
     {
-        string nameDB, nameTable;
-        int number;
-        List<string> names, types;
+        string connectionString = "Data Source=localhost;Initial Catalog=HousesAndStreets;Integrated Security=True";
+        string sqlExpression;
 
-        public void CreateDataBase()
-        {
-            Console.WriteLine("Создание базы данных:");
-            Console.Write("Введите название: ");
-            nameDB = Console.ReadLine();
-            Console.Write(@"Введите путь (Пример: 'C:\Db\Test'): ");
-            string path = Console.ReadLine();
-            SqlConnection connection = new SqlConnection("Server=localhost; Integrated security=SSPI; database=master");
-            string sqlExpression = string.Format(@"CREATE DATABASE {0} ON PRIMARY (NAME = {0}, FILENAME = '{1}\{0}.mdf')", nameDB, path);
-            SqlCommand command = new SqlCommand(sqlExpression, connection);
-            try
-            {
-                connection.Open();
-                command.ExecuteNonQuery();
-                Console.WriteLine("База данных с именем {0} успешно создана.", nameDB);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
+        public void Insert(string value1, string value2, int flag)
+        {            
+            sqlExpression = "INSERT INTO @table (@col1, @col2) VALUES (@value1, @value2)";
+            string column1 ="", column2 = "", table = "";
 
-        public void CreateTable()
-        {
-            Console.WriteLine("Создание таблицы:");
-            Console.Write("Введите название таблицы: ");
-            nameTable = Console.ReadLine();
-            Console.Write("Введите кол-во столбцов (Поле id будет созданно автоматически): ");
-            number = int.Parse(Console.ReadLine());
-            names = new List<string>();
-            types = new List<string>();
-            for (int i = 0; i < number; i++)
+            if(flag == 1)
             {
-                Console.Write("Введите имя {0} столбца: ", i + 1);
-                names.Add(Console.ReadLine());
-                Console.Write("Введите тип {0} столбца (int, real, money и т.д...): ", i + 1);
-                types.Add(Console.ReadLine());
+                column1 = "City";
+                column2 = "Name";
+                table = "Streets";
             }
-            SqlConnection connection = new SqlConnection(string.Format("Server=localhost; Integrated security=SSPI; database={0}", nameDB));
-            string sqlExpression = string.Format("CREATE TABLE {0} (id int PRIMARY KEY IDENTITY", nameTable);
-            for (int i = 0; i < number; i++)
-                sqlExpression += string.Format(", {0} {1}", names[i], types[i]);
-            sqlExpression += ")";
-            SqlCommand command = new SqlCommand(sqlExpression, connection);
-            try
+            else if(flag == 2)
             {
-                connection.Open();
-                command.ExecuteNonQuery();
-                Console.WriteLine("Таблица с именем {0} успешно создана", nameTable);
+                column1 = "Street";
+                column2 = "Number";
+                table = "Houses";
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
 
-        public void Insert()
-        {
-            string sqlExpression;
-            for (int i = 0; i < number; i++)
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                Console.Write("Введите значение {0}-го столбца: ", i + 1);
-                sqlExpression = string.Format("INSERT INTO dbo.{0} ({1}) VALUES ({2})", nameTable, names[i], Console.ReadLine());
-                using (SqlConnection connection = new SqlConnection(string.Format("Server=localhost; Integrated security=SSPI; database={0}", nameDB)))
+                try
+                {                     
+                    connection.Open();
+                    SqlCommand command = new SqlCommand(sqlExpression, connection);
+                    SqlParameter val1 = new SqlParameter("@val1", value1);
+                    command.Parameters.Add(val1);
+                    SqlParameter val2 = new SqlParameter("@val2", value2);
+                    command.Parameters.Add(val2);
+                    SqlParameter col1 = new SqlParameter("@col1", column1);
+                    command.Parameters.Add(col1);
+                    SqlParameter col2 = new SqlParameter("@col2", column2);
+                    command.Parameters.Add(col2);
+                    SqlParameter tab = new SqlParameter("@table", table);
+                    command.Parameters.Add(tab);
+
+                    int number = command.ExecuteNonQuery();
+                    Console.WriteLine("Uploaded {0}", number);
+                }
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        connection.Open();
-                        SqlCommand command = new SqlCommand(sqlExpression, connection);
-                        int number = command.ExecuteNonQuery();
-                        Console.WriteLine("Добавлено полей: {0}", number);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.ToString());
-                    }
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    connection.Close();
                 }
             }
         }
 
-        public void Update(string _id)
-        {
-            for (int i = 0; i < number; i++)
+        public void Update(string name, string city, int numberOfHouse, int id)
+        {            
+            sqlExpression = string.Format("UPDATE Streets SET Name = @Name, City = @City, NumberOfHouses = @Numb WHERE id = {0}", id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                Console.Write("Введите новое значение {0}-го столбца: ", i + 1);
-                string sqlExpression = string.Format("UPDATE dbo.{0} SET {1} = {2} WHERE id = {3}", nameTable, names[i], Console.ReadLine(), _id);
-                using (SqlConnection connection = new SqlConnection(string.Format("Server=localhost; Integrated security=SSPI; database={0}", nameDB)))
+                try
                 {
-                    try
-                    {
-                        connection.Open();
-                        SqlCommand command = new SqlCommand(sqlExpression, connection);
-                        int number = command.ExecuteNonQuery();
-                        Console.WriteLine("Обновлено полей: {0}", number);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.ToString());
-                    }
+                    connection.Open();
+                    SqlCommand command = new SqlCommand(sqlExpression, connection);
+                    SqlParameter nameParam = new SqlParameter("@Name", name);
+                    command.Parameters.Add(nameParam);
+                    SqlParameter cityParam = new SqlParameter("@City", city);
+                    command.Parameters.Add(cityParam);
+                    SqlParameter numbParam = new SqlParameter("@Numb", numberOfHouse);
+                    command.Parameters.Add(numbParam);
+                    int number = command.ExecuteNonQuery();
+                    Console.WriteLine("Updated {0}", number);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    connection.Close();
                 }
             }
         }
 
-        public void Delete(string _id)
+        public void Delete(int id)
         {
-            string sqlExpression = string.Format("DELETE FROM dbo.{0} WHERE id = {1}", nameTable, _id);
-            using (SqlConnection connection = new SqlConnection(string.Format("Server=localhost; Integrated security=SSPI; database={0}", nameDB)))
+            sqlExpression = string.Format("DELETE FROM Streets WHERE id = {0}", id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
                     int number = command.ExecuteNonQuery();
-                    Console.WriteLine("Удалено полей: {0}", number);                
+                    Console.WriteLine("Deleted {0}", number);                
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
+                finally
+                {
+                    connection.Close();
+                }
             }
         }
 
-        public void Select(string _id)
+        public void Select(int id)
         {
-            string sqlExpression = string.Format("SELECT * FROM dbo.{0} WHERE id = {1}", nameTable, _id);
-            List<object> values = new List<object>();
+            sqlExpression = string.Format("SELECT * FROM Streets WHERE id = {0}", id);
             try
             {
-                using (SqlConnection connection = new SqlConnection(string.Format("Server=localhost; Integrated security=SSPI; database={0}", nameDB)))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     SqlCommand command = new SqlCommand(sqlExpression, connection);
@@ -149,11 +126,8 @@ namespace test1
 
                     if (reader.HasRows)
                     {
-                        while (reader.Read())
-                        {
-                            for (int i = 1; i <= number; i++)
-                                Console.WriteLine("{0} = {1}", reader.GetName(i), reader.GetValue(i));
-                        }
+                        while (reader.Read())                            
+                             Console.WriteLine("{0} = {1}", reader.GetName(2), reader.GetValue(3));
                     }
                     reader.Close();
                 }
@@ -161,7 +135,7 @@ namespace test1
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-            }
+            }            
         }
     }
 }
