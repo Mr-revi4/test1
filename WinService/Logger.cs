@@ -8,7 +8,7 @@ namespace WinService
     {
         FileSystemWatcher watcher;
         bool enable = true;
-        object locker;
+        object locker = new object();
         public Logger()
         {
             watcher = new FileSystemWatcher(@"C:\Db");
@@ -46,7 +46,7 @@ namespace WinService
 
         private void RecordEntry(string fileEvent, string filePath)
         {
-            lock (locker =new object())
+            lock (locker)
             {
                 using (StreamWriter writer = new StreamWriter("Log.txt"))
                 {
